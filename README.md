@@ -27,8 +27,8 @@
 
 # ダウンロード ⬇️
 
-[Booth]()からどうぞ。
-TODO: リンクをはる
+[Releases](https://github.com/nonuplet/streameme/releases)からどうぞ。
+近日中にBoothも開設予定です。
 
 # セットアップ 🔧
 
