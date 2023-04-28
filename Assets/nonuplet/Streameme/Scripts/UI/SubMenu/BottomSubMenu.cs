@@ -9,13 +9,13 @@ namespace Streameme.UI.SubMenu
     /// </summary>
     public abstract class BottomSubMenu : MonoBehaviour
     {
-        public StrememeCore core;
+        public StreamemeCore core;
         private CanvasGroupTransition _canvasGroup;
 
 #if UNITY_EDITOR
         protected virtual void Reset()
         {
-            GameObject.Find("Strememe").TryGetComponent(out core);
+            GameObject.Find("Streameme").TryGetComponent(out core);
         }
 #endif
 

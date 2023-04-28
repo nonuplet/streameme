@@ -14,7 +14,7 @@ namespace Streameme
     /// <summary>
     /// メインスクリプト
     /// </summary>
-    public class StrememeCore : MonoBehaviour
+    public class StreamemeCore : MonoBehaviour
     {
         public MemeReceiver memeReceiver;
         public LoadVrmFile vrmLoader;
@@ -104,12 +104,12 @@ namespace Streameme
 
 
 #if UNITY_EDITOR
-    [CustomEditor(typeof(StrememeCore))]
-    public class StrememeCoreEditor : Editor
+    [CustomEditor(typeof(StreamemeCore))]
+    public class StreamemeCoreEditor : Editor
     {
         public override void OnInspectorGUI()
         {
-            var core = (StrememeCore)target;
+            var core = (StreamemeCore)target;
             EditorGUILayout.LabelField("Scripts & Objects", EditorStyles.boldLabel);
             addField(nameof(core.memeReceiver), "MemeReceiver");
             addField(nameof(core.vrmLoader), "VRMLoader");

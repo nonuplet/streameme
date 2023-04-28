@@ -18,7 +18,7 @@ namespace Streameme.UI.SubMenu
 #if UNITY_EDITOR
         protected override void Reset()
         {
-            GameObject.Find("Strememe").TryGetComponent(out core);
+            GameObject.Find("Streameme").TryGetComponent(out core);
             var panel = transform.Find("Panel");
             panel.transform.Find("Button_YawReset").TryGetComponent(out yawResetButton);
             panel.transform.Find("Textfield_Port").TryGetComponent(out portField);
