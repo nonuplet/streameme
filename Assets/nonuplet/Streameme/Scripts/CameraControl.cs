@@ -229,6 +229,32 @@ namespace Streameme
                     // ドリーイン・アウト
                     camTransform.Translate(0, 0, scroll, Space.Self);
                 }
+
+                // キー操作
+                if (Input.GetKeyDown(KeyCode.Alpha1))
+                {
+                    SetCameraFront();
+                }
+                if (Input.GetKeyDown(KeyCode.Alpha2))
+                {
+                    SetCameraBack();
+                }
+                if (Input.GetKeyDown(KeyCode.Alpha3))
+                {
+                    SetCameraFree();
+                }
+                if (Input.GetKeyDown(KeyCode.F1))
+                {
+                    SetBackground(BackgroundMode.Skybox);
+                }
+                if (Input.GetKeyDown(KeyCode.F2))
+                {
+                    SetBackground(BackgroundMode.GreenBack);
+                }
+                if (Input.GetKeyDown(KeyCode.F3))
+                {
+                    SetBackground(BackgroundMode.BlueBack);
+                }
             }
 
             if (Input.GetKeyDown(KeyCode.Keypad1))

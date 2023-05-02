@@ -82,7 +82,7 @@ namespace Streameme.Avatar
         {
             if (_meme == null) return;
 
-            if (Input.GetKeyDown(KeyCode.A))
+            if (Input.GetKeyDown(KeyCode.F))
             {
                 ResetFrontYaw();
                 _init = false;
