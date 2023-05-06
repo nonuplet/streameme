@@ -1,7 +1,4 @@
-using System;
-using System.Windows.Forms;
 using Streameme.Avatar;
-using UnityEditor.VersionControl;
 using UnityEngine;
 using UnityEngine.Events;
 using WebSocketSharp;
@@ -28,14 +25,22 @@ namespace Streameme
         public int websocketPort = 5000;
 
         public MotionController _motion;
+        [SerializeField] private BatteryIndicator _battery;
 
-        public UnityEvent onMemeConnected = new UnityEvent();
-        public UnityEvent onMemeDisconnected = new UnityEvent();
+        public UnityEvent onMemeConnected = new();
+        public UnityEvent onMemeDisconnected = new();
 
         private ConnectionEvent _connectionEvent = ConnectionEvent.None;
 
         private float _frontYaw;
         private bool _loaded = false;
+
+#if UNITY_EDITOR
+        private void Reset()
+        {
+            GameObject.Find("BatteryIndicator").TryGetComponent(out _battery);
+        }
+#endif
 
         private void OnEnable()
         {
@@ -114,7 +119,9 @@ namespace Streameme
         {
             var msg = e.Data;
             if (msg.Contains("heartbeat") || !_loaded) return;
-            _motion.SetCurrentData(JsonUtility.FromJson<MemeCurrentData>(msg));
+            var data = JsonUtility.FromJson<MemeCurrentData>(msg);
+            _motion.SetCurrentData(data);
+            _battery.SetBatteryValue(data.powerLeft);
         }
         
         
