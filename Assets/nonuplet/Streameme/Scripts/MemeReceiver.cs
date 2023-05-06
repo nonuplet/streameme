@@ -1,10 +1,24 @@
+using System;
+using System.Windows.Forms;
 using Streameme.Avatar;
+using UnityEditor.VersionControl;
 using UnityEngine;
+using UnityEngine.Events;
 using WebSocketSharp;
 using WebSocketSharp.Server;
 
 namespace Streameme
 {
+    /// <summary>
+    /// 接続に関するイベント
+    /// </summary>
+    public enum ConnectionEvent
+    {
+        None,
+        OnOpen,
+        OnClose
+    }
+    
     /// <summary>
     /// MEMEのデータ取得
     /// </summary>
@@ -14,6 +28,11 @@ namespace Streameme
         public int websocketPort = 5000;
 
         public MotionController _motion;
+
+        public UnityEvent onMemeConnected = new UnityEvent();
+        public UnityEvent onMemeDisconnected = new UnityEvent();
+
+        private ConnectionEvent _connectionEvent = ConnectionEvent.None;
 
         private float _frontYaw;
         private bool _loaded = false;
@@ -28,6 +47,21 @@ namespace Streameme
             StopListen();
         }
 
+        private void Update()
+        {
+            // UnityEventのMain Thread問題対策
+            if (_connectionEvent == ConnectionEvent.OnOpen)
+            {
+                onMemeConnected.Invoke();
+                _connectionEvent = ConnectionEvent.None;
+            }
+            else if (_connectionEvent == ConnectionEvent.OnClose)
+            {
+                onMemeDisconnected.Invoke();
+                _connectionEvent = ConnectionEvent.None;
+            }
+        }
+
         /// <summary>
         /// Websocketの受付開始
         /// </summary>
@@ -35,7 +69,11 @@ namespace Streameme
         {
             _ws = new WebSocketServer(websocketPort);
             _ws.AddWebSocketService<OnReceived>("/",
-                serverBehavior => { serverBehavior.SetOnMessageEvent(OnMessage); });
+                serverBehavior =>
+                {
+                    serverBehavior.SetOnMessageEvent(OnMessage);
+                    serverBehavior.SetOnConnectionEvent(OnConnectionEvent);
+                });
             _ws.Start();
         }
 
@@ -78,6 +116,14 @@ namespace Streameme
             if (msg.Contains("heartbeat") || !_loaded) return;
             _motion.SetCurrentData(JsonUtility.FromJson<MemeCurrentData>(msg));
         }
+        
+        
+        private void OnConnectionEvent(ConnectionEvent connection)
+        {
+            // ここでEventをここでInvokeしようとすると、以下のエラーとなるためUpdate内で処理するように対策
+            // "UnityEngine.UnityException: set_interactable can only be called from the main thread."
+            _connectionEvent = connection;
+        }
 
         // private void SendOscTest()
         // { TODO: 別のクラスへ移行
@@ -91,17 +137,35 @@ namespace Streameme
     public class OnReceived : WebSocketBehavior
     {
         private OnMessageDelegate _onMessage;
+        private OnConnectionEventDelegate _onConnectionEvent;
 
         public delegate void OnMessageDelegate(MessageEventArgs e);
+
+        public delegate void OnConnectionEventDelegate(ConnectionEvent connection);
 
         public void SetOnMessageEvent(OnMessageDelegate dlg)
         {
             _onMessage = dlg;
         }
 
+        public void SetOnConnectionEvent(OnConnectionEventDelegate dlg)
+        {
+            _onConnectionEvent = dlg;
+        }
+
         protected override void OnMessage(MessageEventArgs e)
         {
             _onMessage(e);
+        }
+
+        protected override void OnOpen()
+        {
+            _onConnectionEvent(ConnectionEvent.OnOpen);
+        }
+
+        protected override void OnClose(CloseEventArgs e)
+        {
+            _onConnectionEvent(ConnectionEvent.OnClose);
         }
     }
 }
