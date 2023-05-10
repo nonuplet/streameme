@@ -1,3 +1,6 @@
+using System;
+using System.IO;
+using SFB;
 using Streameme.Avatar;
 using Streameme.UI;
 using Streameme.UI.SubMenu;
@@ -16,6 +19,7 @@ namespace Streameme
     /// </summary>
     public class StreamemeCore : MonoBehaviour
     {
+        
         public MemeReceiver memeReceiver;
         public LoadVrmFile vrmLoader;
         public EventSystem eventSystem;
@@ -48,7 +52,12 @@ namespace Streameme
 
         private void Awake()
         {
-            vrmLoadButton.onClick.AddListener(LoadVrm);
+            vrmLoadButton.onClick.AddListener(LoadVrmWithBrowser);
+        }
+
+        private void Start()
+        {
+            LoadVrm(StreamemeConfig.config.vrmPath);
         }
 
         private void Update()
@@ -70,15 +79,36 @@ namespace Streameme
         }
 
         /// <summary>
+        /// ファイルブラウザ経由でVRMの読み込み
+        /// </summary>
+        private void LoadVrmWithBrowser()
+        {
+            var ext = new[]
+            {
+                new ExtensionFilter("VRM Files", "vrm")
+            };
+            var filePath = StandaloneFileBrowser.OpenFilePanel("読み込むVRMファイルを選択", "", ext, false);
+            if (filePath.Length == 0) return;
+            LoadVrm(filePath[0]);
+        }
+
+        /// <summary>
         /// VRMの読み込み
         /// </summary>
-        private async void LoadVrm()
+        private async void LoadVrm(string path)
         {
+            // pathの存在チェック
+            if (!File.Exists(path)) return;
+            
             // ランタイムロード
             var oldAvatar = _avatar;
-            var avatar = await vrmLoader.OpenFile();
+            var avatar = await vrmLoader.OpenFile(path);
             eventSystem.SetSelectedGameObject(null);
             if (avatar == null) return;
+            
+            // ロード成功したタイミングでConfigのセーブ
+            StreamemeConfig.config.vrmPath = path;
+            StreamemeConfig.Save();
 
             // 元々読み込んでいたアバターがあればDestroy
             memeReceiver.ResetMotion();

@@ -44,6 +44,7 @@ namespace Streameme
 
         private void OnEnable()
         {
+            websocketPort = StreamemeConfig.config.websocketPort;
             StartListen();
         }
 
@@ -100,6 +101,8 @@ namespace Streameme
         {
             StopListen();
             websocketPort = port;
+            StreamemeConfig.config.websocketPort = port;
+            StreamemeConfig.Save();
             StartListen();
         }
 
