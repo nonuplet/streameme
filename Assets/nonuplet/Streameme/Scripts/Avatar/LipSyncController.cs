@@ -11,7 +11,7 @@ namespace Streameme.Avatar
     {
         private GameObject _model;
         private uLipSyncBlendShapeVRM _lipBlend;
-        private uLipSyncAudioSource audo;
+        private uLipSyncAudioSource _source;
         private uLipSync.uLipSync _uLipSync;
         [NonSerialized] public uLipSyncMicrophone _uLipMic;
 
@@ -19,6 +19,16 @@ namespace Streameme.Avatar
         {
             gameObject.TryGetComponent(out _uLipSync);
             gameObject.TryGetComponent(out _uLipMic);
+            
+            // Configから読み込み
+            var micName = StreamemeConfig.config.micDevice;
+            var num = MicUtil.GetDeviceList().FindIndex(
+                device => device.name == micName
+            );
+            if (num > 0)
+            {
+                ChangeMic(num);
+            }
         }
 
         /// <summary>
@@ -67,6 +77,9 @@ namespace Streameme.Avatar
             _uLipMic.StopRecord();
             _uLipMic.index = index;
             _uLipMic.StartRecord();
+            
+            StreamemeConfig.config.micDevice = MicUtil.GetDeviceList()[index].name;
+            StreamemeConfig.Save();
         }
     }
 }

@@ -22,3 +22,6 @@ VRM
 VRM.meta
 VRMShaders
 VRMShaders.meta
+
+# Generated config files
+defaultSetting*

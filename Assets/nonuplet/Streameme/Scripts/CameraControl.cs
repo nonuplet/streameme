@@ -64,6 +64,9 @@ namespace Streameme
             _camAngle = Vector3.zero;
             _freePos = Vector3.zero;
             _freeAngle = Vector3.zero;
+            
+            bgMode = StreamemeConfig.config.bgMode;
+            SetBackground(bgMode);
         }
 
         /// <summary>
@@ -182,6 +185,8 @@ namespace Streameme
             }
 
             bgMode = mode;
+            StreamemeConfig.config.bgMode = bgMode;
+            StreamemeConfig.Save();
         }
 
 
